@@ -1,2 +1,7 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+	import Draw from '$lib/components/Draw.svelte';
+	import { Button } from 'flowbite-svelte';
+</script>
+
+<h2>Model currently not trained! Help train it here:</h2>
+<Button href="/training">Train</Button>
