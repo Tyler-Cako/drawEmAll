@@ -5,8 +5,8 @@
 
 <div class="h-screen">
 	<Navbar />
-	<div class="flex align-center justify-center bg-blue-500">
-		<div class="w-9/12 bg-purple-500">
+	<div class="flex align-center justify-center bg-poke_blue-400 h-full">
+		<div class="w-9/12 h-full">
 			<slot />
 		</div>
 	</div>

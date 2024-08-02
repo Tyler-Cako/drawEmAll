@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Draw from '$lib/components/Draw.svelte';
 	import { Button } from 'flowbite-svelte';
 </script>
 
