@@ -8,11 +8,14 @@ func Sigmoid(inputVector []float64) []float64 {
 	outputVector := make([]float64, len(inputVector))
 
 	for i := 0; i <= len(inputVector); i++ {
-		zi := (1 / (1 + math.Exp(inputVector[i])))
-		outputVector[i] = zi
+		outputVector[i] = (1 / (1 + math.Exp(inputVector[i])))
 	}
 
 	return outputVector
+}
+
+func SigmoidElementwise(inputValue float64) float64 {
+	return (1 / (1 + math.Exp(inputValue)))
 }
 
 func SigmoidPrime(inputVector []float64) []float64 {
@@ -21,6 +24,16 @@ func SigmoidPrime(inputVector []float64) []float64 {
 	for i := 0; i <= len(inputVector); i++ {
 		zi := (1 / (1 + math.Exp(inputVector[i])))
 		outputVector[i] = zi * (1 - zi)
+	}
+
+	return outputVector
+}
+
+func CostDerivative(outputActivations, desiredOutput []float64) []float64 {
+	outputVector := make([]float64, len(outputActivations))
+
+	for i := 0; i < len(outputActivations); i++ {
+		outputVector[i] = outputActivations[i] - desiredOutput[i]
 	}
 
 	return outputVector
@@ -60,6 +73,10 @@ func DotProduct(v1, v2 []float64) float64 {
 }
 
 func VectorAdd(v1, v2 []float64) []float64 {
+	if len(v1) != len(v2) {
+		return make([]float64, len(v1))
+	}
+
 	output := make([]float64, len(v1))
 
 	if len(v1) != len(v2) {
@@ -74,6 +91,10 @@ func VectorAdd(v1, v2 []float64) []float64 {
 }
 
 func MatrixVectorMult(m [][]float64, v []float64) []float64 {
+	if len(v) != len(m) {
+		return make([]float64, len(v))
+	}
+
 	output := make([]float64, len(v))
 
 	for i := 0; i < len(v); i++ {
@@ -82,5 +103,13 @@ func MatrixVectorMult(m [][]float64, v []float64) []float64 {
 		}
 	}
 
+	return output
+}
+
+func HadamardProduct(v1, v2 []float64) []float64 {
+	output := make([]float64, len(v1))
+	for i := 0; i < len(v1); i++ {
+		output[i] = v1[i] * v2[i]
+	}
 	return output
 }

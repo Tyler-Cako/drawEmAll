@@ -32,12 +32,12 @@ func TestGenerateWeights(t *testing.T) {
 
 	output := generateWeights(sizes)
 
-	for i := 0; i < len(sizes); i++ {
+	for i := 0; i < len(sizes)-1; i++ {
 		matrix := output[i]
-		if len(matrix) != expectedMatrixSizes[i][1] {
+		if len(matrix) != expectedMatrixSizes[i][0] {
 			t.Errorf("Output # of cols of output matrix: %d different than expected: %d", len(matrix), expectedMatrixSizes[i][1])
 		}
-		if len(matrix[0]) != expectedMatrixSizes[i][0] {
+		if len(matrix[0]) != expectedMatrixSizes[i][1] {
 			t.Errorf("Output # of rows of output matrix: %d different than expected: %d", len(matrix[0]), expectedMatrixSizes[i][0])
 		}
 	}
@@ -45,6 +45,20 @@ func TestGenerateWeights(t *testing.T) {
 }
 
 // func TestFeedForward(t *testing.T) {
-// 	sizes :=
-// 	//feedForward()
+// 	input := []float64{1, 2, 3}
+// 	biases := []float64{1, 1, 1}
+// 	weights := [][][]float64{
+// 		{
+// 			{0.6, -0.5, 1.1},
+// 		},
+// 		{
+// 			{.4}, {.9}, {1.1},
+// 		},
+// 	}
+
+// 	output := feedForward(input, biases, weights)
+
+// 	for i := 0; i < len(output); i++ {
+
+// 	}
 // }
