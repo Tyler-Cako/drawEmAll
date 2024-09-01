@@ -25,6 +25,9 @@ jobs:
   build-site:
     runs-on: ubuntu-latest
     steps:
+      - name: Change working directory
+        working-directory: ./webapp
+        
       - name: Checkout
         uses: actions/checkout@v3
       
