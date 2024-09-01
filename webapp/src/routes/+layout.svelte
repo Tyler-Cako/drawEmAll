@@ -1,6 +1,8 @@
 <script>
 	import '../app.css';
 	import Navbar from '$lib/components/Navbar.svelte';
+
+	export const prerender = true;
 </script>
 
 <div class="h-screen">
