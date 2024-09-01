@@ -1,6 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, createEventDispatcher } from 'svelte';
 	import { Button } from 'flowbite-svelte';
+	import type { PokemonJSON } from '$lib/types/PokemonJSON';
+
+	const dispatch = createEventDispatcher();
+
+	export let pokemonJSON: PokemonJSON | null;
 
 	let canvasElement: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D;
@@ -57,13 +62,33 @@
 	};
 
 	const submitCanvas = () => {
-		const dataURL = canvasElement.toDataURL();
+		try {
+			canvasElement.toBlob((blob: Blob | null) => {
+				if (blob) {
+					dispatch('canvasSubmit', {
+						blob: blob
+					});
+				}
+			}, 'image/jpeg');
+
+			const pokemonCry = new Audio(pokemonJSON?.cries.latest);
+
+			pokemonCry.play();
+			clearCanvas();
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	onMount(() => {
+		console.log(pokemonJSON);
 		ctx = canvasElement.getContext('2d') as CanvasRenderingContext2D;
 	});
 </script>
+
+<div class="w-full flex items-center flex-col">
+	<img src={pokemonJSON?.sprites.front_default} alt={pokemonJSON?.forms.name} />
+</div>
 
 <div class="flex justify-center">
 	<canvas
@@ -77,5 +102,5 @@
 		on:mouseenter={(e) => handleMouseEnter(e)}
 	/>
 </div>
-<Button>Submit</Button>
+<Button on:click={() => submitCanvas()}>Submit</Button>
 <Button on:click={() => clearCanvas()}>Clear Canvas</Button>

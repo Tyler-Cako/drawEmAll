@@ -1,5 +1,6 @@
 <script>
 	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
+	import { base } from '$app/paths';
 </script>
 
 <Navbar class="bg-poke_yellow-500">
@@ -10,8 +11,8 @@
 	</NavBrand>
 	<NavHamburger />
 	<NavUl>
-		<NavLi href="/">Draw</NavLi>
-		<NavLi href="/training">Training</NavLi>
-		<NavLi href="/about">About</NavLi>
+		<NavLi href={base + '/'}>Draw</NavLi>
+		<NavLi href={base + '/training'}>Training</NavLi>
+		<NavLi href={base + '/about'}>About</NavLi>
 	</NavUl>
 </Navbar>
