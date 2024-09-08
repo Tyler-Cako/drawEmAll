@@ -18,6 +18,7 @@
 		"@azure/static-web-apps-cli": "^2.0.1",
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/adapter-node": "^5.2.2",
 		"@sveltejs/adapter-static": "^3.0.4",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
@@ -42,8 +43,5 @@
 		"vite": "^5.0.3",
 		"vitest": "^1.2.0"
 	},
-	"type": "module",
-	"dependencies": {
-		"@sveltejs/adapter-node": "^5.2.2"
-	}
+	"type": "module"
 }
