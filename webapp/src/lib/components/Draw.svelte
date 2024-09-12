@@ -73,6 +73,7 @@
 
 			const pokemonCry = new Audio(pokemonJSON?.cries.latest);
 
+			pokemonCry.volume = 0.3;
 			pokemonCry.play();
 			clearCanvas();
 		} catch (error) {

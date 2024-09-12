@@ -16,8 +16,12 @@ const blobServiceClient = new BlobServiceClient(
 
 const containerClient = blobServiceClient.getContainerClient(containerName);
 
-export const actions = {
-	formUploadBlob: async ({ request }) => {
-		const data = await request.formData();
-	}
-};
+export async function POST({ request }: { request: Request }) {
+	const reqJSON = await request.json();
+	console.log(reqJSON);
+	console.log(request);
+
+	const test = new Response();
+
+	return test;
+}

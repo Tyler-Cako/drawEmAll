@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Draw from '$lib/components/Draw.svelte';
 	import { onMount } from 'svelte';
-	import { uploadBlob } from '$lib/services/uploadBlob';
 	import type { PokemonJSON } from '$lib/types/PokemonJSON';
 	import { Button } from 'flowbite-svelte';
 
@@ -32,9 +31,9 @@
 	};
 
 	const uploadCanvas = async (blob: Blob) => {
-		const response = await fetch('/', {
+		const response = await fetch('/training', {
 			method: 'POST',
-			body: blob,
+			body: JSON.stringify(await blob.text()),
 			headers: {
 				'Content-Type': 'application/json'
 			}
