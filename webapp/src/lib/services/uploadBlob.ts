@@ -1,16 +1,13 @@
-import { DefaultAzureCredential } from '@azure/identity';
-import { BlobServiceClient } from '@azure/storage-blob';
+import { ContainerClient } from '@azure/storage-blob';
 
-const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-if (!accountName) throw Error('Azure Storage accountName not found');
+export const uploadBlob = async (pokemon: string, blob: Blob, containerClient: ContainerClient) => {
+	try {
+		const blobName = pokemon + new Date().getUTCMilliseconds();
+		const blobClient = containerClient.getBlockBlobClient(blobName);
 
-const blobServiceClient = new BlobServiceClient(
-	`https://${accountName}.blob.core.windows.net`,
-	new DefaultAzureCredential()
-);
-
-export const uploadBlob = async (pokemon: string, blob: Blob) => {
-	const blobText = await blob.text();
-	localStorage.setItem(pokemon, blobText);
-	console.log(`Successfully uploaded drawing of ${pokemon} as blob: ${blobText}`);
+		const res = await blobClient.upload(blob, 1);
+		console.log(`Successfully uploaded drawing of ${pokemon} as blob. ${res}`);
+	} catch (error) {
+		console.log(error);
+	}
 };

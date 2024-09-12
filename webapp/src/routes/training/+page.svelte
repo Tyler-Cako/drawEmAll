@@ -31,9 +31,19 @@
 		pokemonJSON = await pokemonReq.json();
 	};
 
-	const uploadCanvas = (blob: Blob) => {
-		uploadBlob(currentPokemon, blob);
-		updateCounter();
+	const uploadCanvas = async (blob: Blob) => {
+		const response = await fetch('/', {
+			method: 'POST',
+			body: blob,
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		if (response.ok) {
+			updateCounter();
+		} else {
+			throw new Error(`Unable to upload! ${response.status}: ${response.statusText}`);
+		}
 	};
 
 	onMount(async () => {
