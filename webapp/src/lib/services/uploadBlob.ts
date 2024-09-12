@@ -1,6 +1,10 @@
 import { ContainerClient } from '@azure/storage-blob';
 
-export const uploadBlob = async (pokemon: string, blob: Blob, containerClient: ContainerClient) => {
+export const uploadBlob = async (
+	pokemon: string,
+	blob: string,
+	containerClient: ContainerClient
+): Promise<Response> => {
 	try {
 		const blobName = pokemon + new Date().getUTCMilliseconds();
 		const blobClient = containerClient.getBlockBlobClient(blobName);
@@ -10,4 +14,6 @@ export const uploadBlob = async (pokemon: string, blob: Blob, containerClient: C
 	} catch (error) {
 		console.log(error);
 	}
+
+	return new Response();
 };

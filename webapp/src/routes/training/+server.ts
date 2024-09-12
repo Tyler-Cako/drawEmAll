@@ -1,7 +1,7 @@
 import { DefaultAzureCredential } from '@azure/identity';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { AZURE_STORAGE_ACCOUNT_NAME, AZURE_BLOB_CONTAINER_NAME } from '$env/static/private';
-import uploadBlob from '$lib/services/uploadBlob';
+import { uploadBlob } from '$lib/services/uploadBlob';
 
 const accountName = AZURE_STORAGE_ACCOUNT_NAME;
 const containerName = AZURE_BLOB_CONTAINER_NAME;
@@ -17,11 +17,16 @@ const blobServiceClient = new BlobServiceClient(
 const containerClient = blobServiceClient.getContainerClient(containerName);
 
 export async function POST({ request }: { request: Request }) {
-	const reqJSON = await request.json();
-	console.log(reqJSON);
-	console.log(request);
+	const blobText = await request.json();
+	const pokemon = request.headers.get('pokemon');
 
-	const test = new Response();
+	let response = new Response();
 
-	return test;
+	if (pokemon) {
+		response = await uploadBlob(pokemon, blobText, containerClient);
+	} else {
+		throw new Error('Pokemon not selected');
+	}
+
+	return response;
 }

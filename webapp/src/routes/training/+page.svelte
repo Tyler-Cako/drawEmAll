@@ -9,20 +9,22 @@
 	let pokemonJSON: PokemonJSON | null;
 
 	let counter = 0;
+	let counterDisplay = 1;
 
 	const updateCounter = async () => {
 		counter++;
+		counterDisplay++;
 
 		if (counter == 10) {
+			counterDisplay = 1;
 			currentPokemon = pokemonArr[1];
 			updatePokemon();
 		}
 		if (counter == 20) {
+			counterDisplay = 1;
 			currentPokemon = pokemonArr[2];
 			updatePokemon();
 		}
-
-		console.log(counter);
 	};
 
 	const updatePokemon = async () => {
@@ -35,7 +37,8 @@
 			method: 'POST',
 			body: JSON.stringify(await blob.text()),
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				pokemon: currentPokemon
 			}
 		});
 		if (response.ok) {
@@ -55,6 +58,10 @@
 		<h2>Training</h2>
 	</div>
 	{#if counter < 30}
+		<div class="text-poke_red-500 flex justify-center align-center">
+			<p>{counterDisplay}/10</p>
+		</div>
+
 		<Draw {pokemonJSON} on:canvasSubmit={(e) => uploadCanvas(e.detail.blob)} />
 	{:else}
 		<div>All done!</div>
