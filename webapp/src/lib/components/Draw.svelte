@@ -63,13 +63,13 @@
 
 	const submitCanvas = () => {
 		try {
-			canvasElement.toBlob((blob: Blob | null) => {
-				if (blob) {
-					dispatch('canvasSubmit', {
-						blob: blob
-					});
-				}
-			}, 'image/jpeg');
+			const canvasDataURL = canvasElement.toDataURL();
+
+			if (canvasDataURL) {
+				dispatch('canvasSubmit', {
+					dataURL: canvasDataURL
+				});
+			}
 
 			const pokemonCry = new Audio(pokemonJSON?.cries.latest);
 

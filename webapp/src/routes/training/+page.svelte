@@ -32,10 +32,10 @@
 		pokemonJSON = await pokemonReq.json();
 	};
 
-	const uploadCanvas = async (blob: Blob) => {
+	const uploadCanvas = async (dataURL: string) => {
 		const response = await fetch('/training', {
 			method: 'POST',
-			body: JSON.stringify(await blob.text()),
+			body: dataURL,
 			headers: {
 				'Content-Type': 'application/json',
 				pokemon: currentPokemon
@@ -62,7 +62,7 @@
 			<p>{counterDisplay}/10</p>
 		</div>
 
-		<Draw {pokemonJSON} on:canvasSubmit={(e) => uploadCanvas(e.detail.blob)} />
+		<Draw {pokemonJSON} on:canvasSubmit={(e) => uploadCanvas(e.detail.dataURL)} />
 	{:else}
 		<div>All done!</div>
 		<Button data-sveltekit-reload href="/training">Train again</Button>
