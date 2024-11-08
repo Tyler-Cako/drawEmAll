@@ -2,6 +2,10 @@
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { Button } from 'flowbite-svelte';
 	import type { PokemonJSON } from '$lib/types/PokemonJSON';
+	import { error } from '@sveltejs/kit';
+
+	import pkg from 'file-saver';
+	const { saveAs } = pkg;
 
 	const dispatch = createEventDispatcher();
 
@@ -63,13 +67,18 @@
 
 	const submitCanvas = () => {
 		try {
-			const canvasDataURL = canvasElement.toDataURL();
+			const canvasBlobRet = canvasElement.toBlob((blob : Blob | null) => {
+				if (blob) {
+					//saveAs(blob, "./test.png");
+					dispatch('canvasSubmit', {
+						blob: blob
+					});
+				} else {
+					throw new Error("Blob creation failed!")
+				}
+			});
 
-			if (canvasDataURL) {
-				dispatch('canvasSubmit', {
-					dataURL: canvasDataURL
-				});
-			}
+			//console.log(canvasBlobRet)
 
 			const pokemonCry = new Audio(pokemonJSON?.cries.latest);
 

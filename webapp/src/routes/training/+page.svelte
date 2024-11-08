@@ -4,6 +4,8 @@
 	import type { PokemonJSON } from '$lib/types/PokemonJSON';
 	import { Button } from 'flowbite-svelte';
 
+
+
 	const pokemonArr = ['bulbasaur', 'charmander', 'squirtle'];
 	let currentPokemon = pokemonArr[0];
 	let pokemonJSON: PokemonJSON | null;
@@ -32,12 +34,13 @@
 		pokemonJSON = await pokemonReq.json();
 	};
 
-	const uploadCanvas = async (dataURL: string) => {
+	const uploadCanvas = async (blob: Blob) => {
+		//saveAs(blob, "test.png");
 		const response = await fetch('/training', {
 			method: 'POST',
-			body: dataURL,
+			body: blob,
 			headers: {
-				'Content-Type': 'application/json',
+				"Content-Type": "image/png",
 				pokemon: currentPokemon
 			}
 		});
@@ -62,7 +65,7 @@
 			<p>{counterDisplay}/10</p>
 		</div>
 
-		<Draw {pokemonJSON} on:canvasSubmit={(e) => uploadCanvas(e.detail.dataURL)} />
+		<Draw {pokemonJSON} on:canvasSubmit={(e) => uploadCanvas(e.detail.blob)} />
 	{:else}
 		<div>All done!</div>
 		<Button data-sveltekit-reload href="/training">Train again</Button>
