@@ -102,7 +102,7 @@
 			// Check if point is within canvas bounds
 			//console.log(`(x, y): ${[x, y]}, currentColor: ${currentColor}`);
 			if (x < 0 || y < 0 || x >= imgSize || y >= imgSize) {
-				console.log(`${[x, y]} out of bounds, continue`);
+				//console.log(`${[x, y]} out of bounds, continue`);
 				continue;
 			}
 			// Check if we have hit a boundary
@@ -110,14 +110,14 @@
 			// Check if point has already been visited. If not, add the point
 			//console.log("3")
 			if (visited.has([x, y])) {
-				console.log(`${[x, y]} has been visited!`)
+				//console.log(`${[x, y]} has been visited!`)
 				continue;
 			} 
 
 
 			//CHECK THIS CONDITION
 			if (!colorsMatch(currentColor, targetColor, range)) {
-				console.log(`Colors don't match at (${[x, y]})`)
+				//console.log(`Colors don't match at (${[x, y]})`)
 				continue;
 			};
 
