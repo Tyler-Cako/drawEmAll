@@ -4,6 +4,19 @@ export type PokemonJSON = {
 	forms: Forms;
 };
 
+export type PixelData = {
+	width: number,
+	height: number,
+	data: Uint32Array
+};
+
+export const enum DrawTypes {
+	draw = "draw",
+	fill = "fill"
+}
+
+export type CanvasPt = [number, number]
+
 type Sprites = {
 	front_default: string;
 };
