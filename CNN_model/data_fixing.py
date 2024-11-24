@@ -40,7 +40,7 @@ def format_and_label_data(folder_dir = '../images/dataset', image_size = 128, gr
                         img = img.convert('L')  
                         img_array = np.array(img)
                 
-                        if img_array.shape != (128, 128, 1):
+                        if img_array.shape != (image_size, image_size):
                             print(f"Skipping {filename}, invalid shape: {img_array.shape}")
                             continue
                         else:
@@ -53,7 +53,7 @@ def format_and_label_data(folder_dir = '../images/dataset', image_size = 128, gr
                             img = img.convert('RGB')  # Discard the alpha channel
                         img_array = np.array(img)
                 
-                        if img_array.shape != (128, 128, 3):
+                        if img_array.shape != (image_size, image_size, 3):
                             print(f"Skipping {filename}, invalid shape: {img_array.shape}")
                             continue
                         else:
