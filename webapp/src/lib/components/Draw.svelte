@@ -100,41 +100,18 @@
 			const currentColor = getPixel(imageData, x, y);
 
 			// Check if point is within canvas bounds
-			//console.log(`(x, y): ${[x, y]}, currentColor: ${currentColor}`);
-			if (x < 0 || y < 0 || x >= imgSize || y >= imgSize) {
-				//console.log(`${[x, y]} out of bounds, continue`);
-				continue;
-			}
+			if (x < 0 || y < 0 || x >= imgSize || y >= imgSize) continue;
 			// Check if we have hit a boundary
+			if (visited.has([x, y])) continue;
 
-			// Check if point has already been visited. If not, add the point
-			//console.log("3")
-			if (visited.has([x, y])) {
-				//console.log(`${[x, y]} has been visited!`)
-				continue;
-			} 
-
-
-			//CHECK THIS CONDITION
 			if (!colorsMatch(currentColor, targetColor, range)) {
-				//console.log(`Colors don't match at (${[x, y]})`)
 				continue;
 			};
 
-			//if (!colorsMatch(targetColor, fillColor)) continue;
-
-
-			// Update pixel, add border pixels to the queue
 			setPixel(imageData, fillColor, x, y);
 			visited.add([x, y]); 
+			// If I reach the border pixel, I don't add the surrounding pixels to the queue so it misses a few white pixels.diagonal ones?
 			pixelsToCheck.push([x + 1, y], [x - 1, y], [x, y - 1], [x, y + 1]);
-
-
-			//Update imageData after x amount of ticks
-			// tickCount++;
-			// if (tickCount % ticksPerUpdate === 0) {
-			// 	ctx.putImageData(imageData, 0, 0);
-			// }
 		}    
 
 		// Final imageData update
