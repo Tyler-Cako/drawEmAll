@@ -9,7 +9,6 @@ import azurefunctions.extensions.bindings.blob as blob
 
 app = func.FunctionApp()
 
-
 @app.blob_trigger(
     arg_name="client", path="trainingblobs/{foldername}/{blobname}.png", connection="AzureWebJobsStorage"
 )
