@@ -5,5 +5,7 @@
 azure-functions
 azurefunctions-extensions-bindings-blob
 tensorflow==2.18.0
+onnxmltools
+#ai-edge-litert==1.0.1
 numpy
 pillow
