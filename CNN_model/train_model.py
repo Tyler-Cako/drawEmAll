@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.keras import layers, models
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
+from tensorflow.keras.models import Model
 #Creates a model with preset layers, returns a build CNN model
 #Parameters: dropout=0.45, grayscale = False,image_size = 128, optimizer = 'adam'
 def create_CNN_model(dropout=0.45, grayscale = False, image_size = 128, optimizer = 'adam'):
@@ -76,3 +76,23 @@ def CNN_accuracy(model, X_test, y_test):
 
 def load_CNN_model(path = './models/best_model_func.keras'):
     return tf.keras.models.load_model(path)
+
+def CNN_one_pred(model, image):
+    class_to_pokemon = {
+        0 : "Bulbasaur",
+        1 : "Charmander",
+        2 : "Squirtle",
+
+    }
+    image = np.expand_dims(image, axis=0)
+    pred_probs = model.predict(image)
+    predicted_class = np.argmax(pred_probs, axis=1)
+    poke = class_to_pokemon[predicted_class[0]]
+    return poke
+
+def layer_visualization(cnn_model):
+    layer_outputs = [layer.output for layer in cnn_model.layers if isinstance(layer, layers.Conv2D)]
+
+    visualization_model = Model(inputs=cnn_model.input, outputs=layer_outputs)
+    return visualization_model
+    pass

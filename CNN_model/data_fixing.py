@@ -66,3 +66,29 @@ def format_and_label_data(folder_dir = '../images/dataset', image_size = 128, gr
     return (image_data,labels)
 
 
+def format_image(image_path = '../images/Hand_Drawn/Bulbasaur/bulb_color.png', grayscale = False, image_size = 128):
+    img = Image.open(image_path).resize((image_size, image_size))
+    #grayscale
+    if grayscale:
+        img = img.convert('L')  
+        img_array = np.array(img)
+
+        if img_array.shape != (image_size, image_size):
+
+            print("invalid image shape")
+            return None
+        else:
+            return img_array
+
+    else:
+    # Convert to RGB if it's RGBA
+        if img.mode == 'RGBA':
+            img = img.convert('RGB')  # Discard the alpha channel
+        img_array = np.array(img)
+
+        if img_array.shape != (image_size, image_size, 3):
+            print('invalid shape')
+            return None
+        else:
+            return img_array
+    pass
