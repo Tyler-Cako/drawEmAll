@@ -24,6 +24,7 @@ def create_CNN_model(dropout=0.45, grayscale = False, image_size = 128, optimize
     model.add(layers.Flatten())#1d for neural network
 
     model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dropout(dropout)) #address overfitting this helps reduce over fitting
     model.add(layers.Dense(3, activation='softmax'))
 
