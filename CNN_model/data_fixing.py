@@ -10,12 +10,13 @@ from sklearn.model_selection import train_test_split
 # "Charmander": 1,
 # "Squirtle": 2,
 #Parameters folder_dir = '../images/dataset', image_size = 128, grayscale = False
-def format_and_label_data(folder_dir = '../images/dataset', image_size = 128, grayscale = False):
+def format_and_label_data(folder_dir = '../images/dataset', image_size = 128, grayscale = False, combined = False):
     image_directory = folder_dir
     starters = ["Bulbasaur", "Charmander", "Squirtle"]
 
     image_data = []
     labels = []
+    grayscale_data = []
 
     pokemon_to_feature_num = {
         "Bulbasaur": 0,
@@ -35,8 +36,21 @@ def format_and_label_data(folder_dir = '../images/dataset', image_size = 128, gr
                     
                     # Open the image and resize it to a fixed size 
                     img = Image.open(image_path).resize((image_size, image_size))
+                    if combined:  # Generate both grayscale and RGB
+                            # garayscasle
+                            grayscale_img = img.convert('L')
+                            grayscale_array = np.array(grayscale_img)
+
+                            if img.mode == 'RGBA':
+                                img = img.convert('RGB')  
+                            rgb_array = np.array(img)
+
+                            if grayscale_array.shape == (image_size, image_size) and rgb_array.shape == (image_size, image_size, 3):
+                                grayscale_data.append(grayscale_array.reshape(image_size, image_size, 1))  # Add channel dimension
+                                image_data.append(rgb_array)
+                                labels.append(pokemon_to_feature_num[starter])
                     #grayscale
-                    if grayscale:
+                    elif grayscale:
                         img = img.convert('L')  
                         img_array = np.array(img)
                 
@@ -62,8 +76,12 @@ def format_and_label_data(folder_dir = '../images/dataset', image_size = 128, gr
 
     
     image_data = np.array(image_data)
+    grayscale_data = np.array(grayscale_data)
     labels = np.array(labels)
-    return (image_data,labels)
+    if combined:
+        return grayscale_data, image_data, labels
+    else:
+        return (image_data, labels)
 
 
 def format_image(image_path = '../images/Hand_Drawn/Bulbasaur/bulb_color.png', grayscale = False, image_size = 128):
