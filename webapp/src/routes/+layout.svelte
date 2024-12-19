@@ -1,13 +1,23 @@
 <script>
 	import '../app.css';
-	import Navbar from '$lib/components/Navbar.svelte';
+
+	$: innerWidth = 0;
 </script>
 
-<div class="h-screen">
-	<Navbar />
-	<div class="flex align-center justify-center bg-poke_blue-400 h-full">
-		<div class="w-9/12 h-full">
-			<slot />
+<svelte:window bind:innerWidth />
+
+<div class="min-h-screen min-w-fit bg-poke_blue-400">
+	{#if innerWidth >= 768}
+		<div class="flex align-center justify-center h-full">
+			<div class="w-9/12 h-full">
+				<slot />
+			</div>
 		</div>
-	</div>
+	{:else}
+		<div class="flex align-center justify-center h-full">
+			<div class="w-11/12 h-full">
+				<slot />
+			</div>
+		</div>
+	{/if}
 </div>
