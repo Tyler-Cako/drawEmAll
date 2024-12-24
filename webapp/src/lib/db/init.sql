@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS pokemon(name TEXT PRIMARY KEY, sound_effect BLOB, img1 BLOB, img2 BLOB, img3 BLOB);

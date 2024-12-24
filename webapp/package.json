@@ -54,7 +54,9 @@
 		"dotenv": "^16.4.5",
 		"file-save": "^0.2.0",
 		"file-saver": "^2.0.5",
+		"sqlite3": "^5.1.7",
 		"svelte-awesome-color-picker": "^3.1.4",
-		"uuid": "^10.0.0"
+		"uuid": "^10.0.0",
+		"webapp": "file:"
 	}
 }

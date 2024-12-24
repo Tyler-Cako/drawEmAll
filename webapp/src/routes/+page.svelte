@@ -10,7 +10,12 @@
 	let pokemonJSON: PokemonJSON | null;
 
 	const updatePokemon = async () => {
-		const pokemonReq = await fetch(`https://pokeapi.co/api/v2/pokemon/${currentPokemon}`);
+		//const pokemonReq = await fetch(`https://pokeapi.co/api/v2/pokemon/${currentPokemon}`);
+		const pokemonReq = await fetch(`/checkCache`, {
+			headers: {
+				pokemon: currentPokemon
+			}
+		});
 		pokemonJSON = await pokemonReq.json();
 	};
 
