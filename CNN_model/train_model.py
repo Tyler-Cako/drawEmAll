@@ -6,35 +6,43 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Model
 from tensorflow.keras import Input
+from tensorflow.keras import regularizers
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 #Creates a model with preset layers, returns a build CNN model
 #Parameters: dropout=0.45, grayscale = False,image_size = 128, optimizer = 'adam'
-def create_CNN_model(dropout=0.25, grayscale=False, image_size=128, num_classes=3, optimizer='adam'):
+def create_CNN_model(dropout=0.3, grayscale=False, image_size=128, num_classes=3, optimizer='adam'):
     model = models.Sequential()
     # model.add(layers.Rescaling(1./255, input_shape=(image_size, image_size, 3)))  # Rescaling layer
     if grayscale:
-        model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(image_size, image_size, 1)))
+        model.add(layers.Conv2D(32, (3, 3)  , input_shape=(image_size, image_size, 1)))
     else:
-        model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(image_size, image_size, 3)))
+        model.add(layers.Conv2D(32, (3, 3), input_shape=(image_size, image_size, 3)))
     
-    model.add(layers.BatchNormalization())
+    model.add(layers.BatchNormalization())  
+    model.add(layers.ReLU())  
     model.add(layers.MaxPooling2D((2, 2)))
 
-    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.Conv2D(64, (3, 3) ))
     model.add(layers.BatchNormalization())
+    model.add(layers.ReLU())  
     model.add(layers.MaxPooling2D((2, 2)))
 
-    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+    model.add(layers.Conv2D(128, (3, 3)))
     model.add(layers.BatchNormalization())
+    model.add(layers.ReLU())  
     model.add(layers.MaxPooling2D((2, 2)))
 
-    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+    model.add(layers.Conv2D(128, (3, 3)))
     model.add(layers.BatchNormalization())
+    model.add(layers.ReLU())  
     model.add(layers.MaxPooling2D((2, 2)))
 
     # model.add(layers.Flatten())
     model.add(layers.GlobalAveragePooling2D())
     
-    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(128))
+    model.add(layers.BatchNormalization())
+    model.add(layers.ReLU())  
     model.add(layers.Dropout(dropout))
     
     # Adjust the output layer to match the number of classes
@@ -49,24 +57,32 @@ def create_CNN_model(dropout=0.25, grayscale=False, image_size=128, num_classes=
 
 #Trains the model returns the model with the highest accuracy on the test data
 #Parameters: model,model,X_train,y_train,X_test,y_test, num_epochs=75, batch_s = 32, save_path = './models/best_model_func.keras'
-def CNN_fit_train(model,X_train,y_train,X_test,y_test, num_epochs=75, num_batch = 32, save_path = './models/best_model_func.keras', datagen = False,combined = False ):
+def CNN_fit_train(model,X_train,y_train,X_test,y_test, class_weights = {}, num_epochs=75, num_batch = 32, save_path = './models/best_model_func.keras', datagen = False,combined = False):
 
 
+    # checkpoint = ModelCheckpoint(save_path, 
+    #                          monitor='val_accuracy',    # Monitor validation accuracy
+    #                          save_best_only=True,       # Save only the best weights
+    #                          mode='max',                # 'max' means we want to maximize the metric
+    #                          verbose=1)
+    #monitor val_loss
     checkpoint = ModelCheckpoint(save_path, 
-                             monitor='val_accuracy',    # Monitor validation accuracy
-                             save_best_only=True,       # Save only the best weights
-                             mode='max',                # 'max' means we want to maximize the metric
+                             monitor='val_loss',    # Monitor validation loss
+                             save_best_only=True,    # Save only the best weights
+                             mode='min',             # 'min' because we want to minimize the loss
                              verbose=1)
+
     
     if datagen:
+        early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
 
         gen = ImageDataGenerator(
             rescale=1./255, # rescales 
             rotation_range=20,       # Randomly rotate images by up to x degrees
-            width_shift_range=0.2,          # Randomly shift images horizontally by x%
-            height_shift_range=0.2,         # Randomly shift images vertically by x%
-            shear_range=0.2,                # Apply shear transformations
-            zoom_range=0.2,                 # Random zoom
+            width_shift_range=0.20,          # Randomly shift images horizontally by x%
+            height_shift_range=0.20,         # Randomly shift images vertically by x%
+            shear_range=0.20,                # Apply shear transformations
+            zoom_range=0.20,                 # Random zoom
             horizontal_flip=True,           # Randomly flip images horizontally
             fill_mode='nearest'             # Strategy for filling in missing pixels (due to rotation or shift)
         )
@@ -74,8 +90,9 @@ def CNN_fit_train(model,X_train,y_train,X_test,y_test, num_epochs=75, num_batch 
         # gen.fit(X_train)
         model.fit(gen.flow(X_train, y_train, batch_size=num_batch), 
                         epochs=num_epochs, 
+                        class_weight=class_weights,
                         validation_data=val_gen.flow(X_test, y_test, batch_size=32),
-                        callbacks= [checkpoint])
+                        callbacks= [early_stopping,checkpoint])
     elif combined:
         model.fit(
             [ X_train["rgb"],  X_train["grayscaled"]], y_train, 
