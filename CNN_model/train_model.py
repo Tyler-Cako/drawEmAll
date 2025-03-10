@@ -1,23 +1,34 @@
 import numpy as np
-from sklearn.model_selection import train_test_split
+# from sklearn.model_selection import train_test_split
+from augment import rotate, translate_x, translate_y, shear_x, shear_y, RandAugment
+import math
 import tensorflow as tf
-from tensorflow.keras import layers, models
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.models import Model
-from tensorflow.keras import Input
-from tensorflow.keras import regularizers
+import scipy.ndimage as ndimage
+from keras import layers, models
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.models import Model
+from tensorflow.keras import layers, Input
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+# from tensorflow.tfm.vision.augment import rotate
 #Creates a model with preset layers, returns a build CNN model
 #Parameters: dropout=0.45, grayscale = False,image_size = 128, optimizer = 'adam'
 def create_CNN_model(dropout=0.3, grayscale=False, image_size=128, num_classes=3, optimizer='adam'):
     model = models.Sequential()
-    # model.add(layers.Rescaling(1./255, input_shape=(image_size, image_size, 3)))  # Rescaling layer
     if grayscale:
-        model.add(layers.Conv2D(32, (3, 3)  , input_shape=(image_size, image_size, 1)))
+        model.add(layers.InputLayer(input_shape=(image_size, image_size, 1)))
     else:
-        model.add(layers.Conv2D(32, (3, 3), input_shape=(image_size, image_size, 3)))
-    
+        model.add(layers.InputLayer(input_shape=(image_size, image_size, 3)))
+
+    # model.add(layers.Rescaling(1./255))
+    # model.add(layers.RandomRotation(factor=(-0.2, 0.2), fill_mode='nearest', interpolation='bilinear'))
+    # model.add(layers.RandomZoom(height_factor=0.2, width_factor=0.2, fill_mode='nearest'))
+    # model.add(layers.RandomTranslation(height_factor=0.2, width_factor=0.2, fill_mode='nearest'))
+    # model.add(layers.RandomFlip("horizontal"))
+    # # model.add(layers.RandomBrightness(factor=0.2))
+    # model.add(layers.RandomContrast(factor=0.2))
+
+
+    model.add(layers.Conv2D(32, (3, 3) ))
     model.add(layers.BatchNormalization())  
     model.add(layers.ReLU())  
     model.add(layers.MaxPooling2D((2, 2)))
@@ -54,7 +65,58 @@ def create_CNN_model(dropout=0.3, grayscale=False, image_size=128, num_classes=3
 
     return model
 
+def CNN_tsData_train(model, train_dataset, val_dataset, class_weights = {}, num_epochs=75, save_path = './models/best_model_func.keras'):
+    checkpoint = ModelCheckpoint(save_path, 
+                             monitor='val_loss',    # Monitor validation loss
+                             save_best_only=True,    # Save only the best weights
+                             mode='min',             # 'min' because we want to minimize the loss
+                             verbose=1)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)
 
+    model.fit(train_dataset, 
+            epochs=num_epochs,  
+            validation_data=val_dataset,
+            class_weight = class_weights,
+            callbacks= [checkpoint, early_stopping])
+    return model
+
+def augment_train(image, label):
+    image = tf.cast(image, tf.float32) / 255.0
+    
+    # Apply augmentations
+ 
+    image = tf.image.random_flip_left_right(image)
+    image = tf.image.random_flip_up_down(image)
+
+    image = rotate(image, tf.random.uniform([], -30, 30))
+
+    image = tf.image.random_contrast(image, 0.8, 1.2)  # Random contrast adjustment
+    image = tf.image.random_brightness(image, 0.8, 1.2)  # Random brightness adjustmen
+    
+    return image, label
+
+def augment_val(image, label):
+    image = tf.cast(image, tf.float32) / 255.0
+    return image, label
+def create_augmented_train_val_datasets(X_train, y_train, X_test, y_test):
+    
+    train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
+    val_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test))
+
+    train_dataset = train_dataset.shuffle(300)
+    
+
+    train_dataset = train_dataset.map(augment_train, num_parallel_calls=1)
+    val_dataset = val_dataset.map(augment_val, num_parallel_calls=1)
+    
+    train_dataset = train_dataset.batch(8)  # batch sizew
+    train_dataset = train_dataset.prefetch(1)  
+
+    val_dataset = val_dataset.batch(8)
+    val_dataset = val_dataset.cache()
+    val_dataset = val_dataset.prefetch(1)
+
+    return train_dataset, val_dataset
 #Trains the model returns the model with the highest accuracy on the test data
 #Parameters: model,model,X_train,y_train,X_test,y_test, num_epochs=75, batch_s = 32, save_path = './models/best_model_func.keras'
 def CNN_fit_train(model,X_train,y_train,X_test,y_test, class_weights = {}, num_epochs=75, num_batch = 32, save_path = './models/best_model_func.keras', datagen = False,combined = False):
@@ -71,28 +133,36 @@ def CNN_fit_train(model,X_train,y_train,X_test,y_test, class_weights = {}, num_e
                              save_best_only=True,    # Save only the best weights
                              mode='min',             # 'min' because we want to minimize the loss
                              verbose=1)
+    image_gen = ImageDataGenerator(rotation_range=30, # rotate the image 30 degrees
+                               width_shift_range=0.2, # Shift the pic width by a max of 20%
+                               height_shift_range=0.2, # Shift the pic height by a max of 20%
+                               rescale=1/255, # Rescale the image by normalzing it.
+                               shear_range=0.2, # Shear means cutting away part of the image (max 20%)
+                               zoom_range=0.2, # Zoom in by 20% max
+                               horizontal_flip=True, # Allo horizontal flipping
+                               fill_mode='nearest' # Fill in missing pixels with the nearest filled value
+                              )
 
-    
     if datagen:
-        early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+        early_stopping = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)
 
-        gen = ImageDataGenerator(
-            rescale=1./255, # rescales 
-            rotation_range=20,       # Randomly rotate images by up to x degrees
-            width_shift_range=0.20,          # Randomly shift images horizontally by x%
-            height_shift_range=0.20,         # Randomly shift images vertically by x%
-            shear_range=0.20,                # Apply shear transformations
-            zoom_range=0.20,                 # Random zoom
-            horizontal_flip=True,           # Randomly flip images horizontally
-            fill_mode='nearest'             # Strategy for filling in missing pixels (due to rotation or shift)
-        )
-        val_gen = ImageDataGenerator(rescale=1./255)
-        # gen.fit(X_train)
-        model.fit(gen.flow(X_train, y_train, batch_size=num_batch), 
-                        epochs=num_epochs, 
-                        class_weight=class_weights,
-                        validation_data=val_gen.flow(X_test, y_test, batch_size=32),
-                        callbacks= [early_stopping,checkpoint])
+        # model.fit(X_train, y_train, 
+        #         epochs=num_epochs, 
+        #         batch_size=num_batch, 
+        #         validation_data=(X_test, y_test),
+        #         callbacks= [checkpoint, early_stopping])
+        train_data = image_gen.flow(X_train, y_train, num_batch)
+
+        test_gen = ImageDataGenerator(rescale=1/255)
+
+        # Use the generator to preprocess your test data
+        test_data = test_gen.flow(X_test, y_test, batch_size=num_batch)
+        model.fit(train_data ,
+                epochs=num_epochs, 
+                batch_size=num_batch, 
+                validation_data=test_data,
+                callbacks= [checkpoint, early_stopping])
+
     elif combined:
         model.fit(
             [ X_train["rgb"],  X_train["grayscaled"]], y_train, 
@@ -107,7 +177,7 @@ def CNN_fit_train(model,X_train,y_train,X_test,y_test, class_weights = {}, num_e
                 batch_size=num_batch, 
                 validation_data=(X_test, y_test),
                 callbacks= [checkpoint])
-    return tf.keras.models.load_model(save_path)
+    return model
 
 
 
