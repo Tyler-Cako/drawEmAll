@@ -50,6 +50,7 @@
 		"@azure/storage-blob": "^12.24.0",
 		"@melloware/coloris": "^0.24.0",
 		"@sveltejs/adapter-vercel": "^5.4.3",
+		"@tensorflow/tfjs": "^4.22.0",
 		"colord": "^2.9.3",
 		"dotenv": "^16.4.5",
 		"file-save": "^0.2.0",
