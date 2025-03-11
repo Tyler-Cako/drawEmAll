@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const modelPath = path.resolve(__dirname, 'this_one_is_good/model.json');
+const modelPath = path.resolve(__dirname, 'well_trained_model/model.json');
 const modelUrl = `file://${modelPath}`;
 
 //ill move this later
@@ -57,7 +57,7 @@ export async function POST({ request }: { request: Request }) {
 		let imageTensor = tf.node.decodeImage(uint8Array, 3);
 
 		imageTensor  = tf.image.resizeBilinear(imageTensor, [128, 128]);
-		imageTensor = imageTensor.div(255.0);
+		// imageTensor = imageTensor.div(255.0);
 		imageTensor = imageTensor.expandDims(0);
 		
 		console.log(imageTensor.shape);
@@ -66,7 +66,7 @@ export async function POST({ request }: { request: Request }) {
 			let model;
 			model = await tf.loadLayersModel(modelUrl); 
 			console.log("Model loaded successfully");
-			model.summary(); 
+			// model.summary(); 
 			const prediction = model.predict(imageTensor);
 			let best_pred = tf.argMax(prediction, 1).dataSync()[0];;
     	    console.log(prediction); // Print the prediction
