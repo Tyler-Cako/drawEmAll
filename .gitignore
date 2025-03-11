@@ -5,6 +5,7 @@ __pycache__
 .venv
 
 
+.*
 .git*
 .vscode
 __azurite_db*__.json
