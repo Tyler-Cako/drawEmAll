@@ -186,7 +186,8 @@ export async function POST({ request }: { request: Request }) {
 			console.log('Model loaded successfully');
 			const prediction = model.predict(imageTensor);
 			const best_pred = tf.argMax(prediction, 1).dataSync()[0];
-			console.log(prediction); // Print the prediction
+			
+			console.log(prediction); 
 			console.log(pokemonArr[best_pred]);
 
 			return new Response(pokemonArr[best_pred]);
