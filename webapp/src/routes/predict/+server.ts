@@ -200,13 +200,4 @@ export async function POST({ request }: { request: Request }) {
 	return new Response('Prediction failed');
 }
 
-// let model;
-// (async function loadModel() {
-//     try {
-//         model = await tf.loadLayersModel('this_one_is_good/model.json'); // No 'file://' prefix needed in the browser
-//         console.log("Model loaded successfully");
-//         model.summary(); // No need for console.log()
-//     } catch (error) {
-//         console.error("Model failed to load: ", error);
-//     }
-// })();
+
