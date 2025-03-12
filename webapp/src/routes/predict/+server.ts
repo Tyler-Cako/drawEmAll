@@ -1,12 +1,13 @@
 import tf from '@tensorflow/tfjs-node';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getModel } from './model';
 
 // Manually define __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const modelPath = path.resolve(__dirname, 'well_trained_model/model.json');
+const modelPath = path.resolve(__dirname, 'normalized_model_54299/model.json');
 const modelUrl = `file://${modelPath}`;
 
 console.log('test1');
@@ -175,7 +176,7 @@ export async function POST({ request }: { request: Request }) {
 
 		console.log('test5');
 		imageTensor = tf.image.resizeBilinear(imageTensor, [128, 128]);
-		// imageTensor = imageTensor.div(255.0);
+		imageTensor = imageTensor.div(255.0);
 		console.log('test6');
 		imageTensor = imageTensor.expandDims(0);
 
@@ -184,9 +185,10 @@ export async function POST({ request }: { request: Request }) {
 		try {
 			const model = await tf.loadLayersModel(modelUrl);
 			console.log('Model loaded successfully');
+			// const model = getModel();
 			const prediction = model.predict(imageTensor);
 			const best_pred = tf.argMax(prediction, 1).dataSync()[0];
-			
+
 			console.log(prediction); 
 			console.log(pokemonArr[best_pred]);
 
