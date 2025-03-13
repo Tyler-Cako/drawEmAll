@@ -56,8 +56,14 @@ jobs:
         with:
           name: node-app
 
+      # - name: Unzip artifact for deployment
+      #   run: unzip release.zip -d modelNodeApp
+
       - name: Unzip artifact for deployment
-        run: unzip release.zip -d modelNodeApp
+        run: |
+          unzip release.zip -d modelNodeApp
+          ls -la modelNodeApp  # List files for debugging
+
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -70,6 +76,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
+          verbose: true  # Enable debug mode
           app-name: 'pred-model'
           slot-name: 'Production'
           package: modelNodeApp
