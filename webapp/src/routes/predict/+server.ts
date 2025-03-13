@@ -1,4 +1,4 @@
-import tf from '@tensorflow/tfjs-node';
+import * as tf from '@tensorflow/tfjs-node';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getModel } from './model';
