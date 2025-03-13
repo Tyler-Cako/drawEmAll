@@ -1,7 +1,7 @@
-import * as tf from '@tensorflow/tfjs-node';
-import { loadModel } from '$lib/models/model';
-import path from 'path';
-import { fileURLToPath } from 'url';
+// import * as tf from '@tensorflow/tfjs-node';
+// import { loadModel } from '$lib/models/model';
+// import path from 'path';
+// import { fileURLToPath } from 'url';
 
 //const model = await loadModel();
 
