@@ -1,16 +1,17 @@
 import * as tf from '@tensorflow/tfjs-node';
+import { loadModel } from '$lib/models/model';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getModel } from './model';
 
-// Manually define __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+//const model = await loadModel();
 
-const modelPath = path.resolve(__dirname, 'normalized_model_54299/model.json');
-const modelUrl = `file://${modelPath}`;
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
-console.log('test1');
+// const modelPath = path.resolve(__dirname, './normalized_model_54299/model.json');
+// const modelUrl = `file://${modelPath}`;
+
+// const model = await tf.loadLayersModel(modelUrl); 
 
 //ill move this later
 const pokemonArr = [
@@ -158,43 +159,55 @@ const pokemonArr = [
 	'Zubat'
 ];
 
+
 export async function POST({ request }: { request: Request }) {
+
+
 	const reqBlob = await request.blob();
 
-	console.log('test2');
+	console.log(reqBlob);
+
+	// try {
+	// 	const arrayBuffer = await reqBlob.arrayBuffer();
+
+	// 	// Convert ArrayBuffer to Uint8Array
+	// 	const uint8Array = new Uint8Array(arrayBuffer);
+
+	// 	// Decode image into a tensor
+	// 	let imageTensor = tf.node.decodeImage(uint8Array, 3);
+
+	// 	imageTensor = tf.image.resizeBilinear(imageTensor, [128, 128]);
+	// 	imageTensor = imageTensor.div(255.0);
+
+	// 	imageTensor = imageTensor.expandDims(0);
+
+	// 	//console.log(imageTensor.shape);
+	// 	//console.log(imageTensor);
+	// 	try {
+	// 		const prediction = model.predict(imageTensor);
+	// 		const best_pred = tf.argMax(prediction, 1).dataSync()[0];
+
+	// 		//console.log(prediction); 
+	// 		console.log(pokemonArr[best_pred]);
+
+	// 		return new Response(pokemonArr[best_pred]);
+	// 	} catch (error) {
+	// 		console.error('Model failed to load: ', error);
+	// 	}
+	// } catch (error) {
+	// 	console.log(`${error}`);
+	// }
 
 	try {
-		console.log('test3');
-		const arrayBuffer = await reqBlob.arrayBuffer();
+		const response = await fetch('http://localhost:3000/predict', {
+			method: 'POST',
+			body: reqBlob
+		});
 
-		// Convert ArrayBuffer to Uint8Array
-		const uint8Array = new Uint8Array(arrayBuffer);
-
-		console.log('test4');
-		// Decode image into a tensor
-		let imageTensor = tf.node.decodeImage(uint8Array, 3);
-
-		console.log('test5');
-		imageTensor = tf.image.resizeBilinear(imageTensor, [128, 128]);
-		imageTensor = imageTensor.div(255.0);
-		console.log('test6');
-		imageTensor = imageTensor.expandDims(0);
-
-		console.log(imageTensor.shape);
-		console.log(imageTensor);
-		try {
-			const model = await tf.loadLayersModel(modelUrl);
-			console.log('Model loaded successfully');
-			// const model = getModel();
-			const prediction = model.predict(imageTensor);
-			const best_pred = tf.argMax(prediction, 1).dataSync()[0];
-
-			console.log(prediction); 
-			console.log(pokemonArr[best_pred]);
-
-			return new Response(pokemonArr[best_pred]);
-		} catch (error) {
-			console.error('Model failed to load: ', error);
+		if (response.ok) {
+			return response;
+		} else {
+			throw new Error(response.toString());
 		}
 	} catch (error) {
 		console.log(`${error}`);
