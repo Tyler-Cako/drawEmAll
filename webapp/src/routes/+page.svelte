@@ -9,6 +9,10 @@
 	let pokemonIndex = 0;
 	let pokemonJSON: PokemonJSON | null;
 
+	let pokemonPrediction = "";
+
+	//$: console.log(pokemonPrediction);
+
 	const updatePokemon = async () => {
 		const pokemonReq = await fetch(`https://pokeapi.co/api/v2/pokemon/${currentPokemon}`);
 		pokemonJSON = await pokemonReq.json();
@@ -25,7 +29,8 @@
 		});
 		if (response.ok) {
 			const predictedPokemon = await response.text();
-			alert(predictedPokemon);
+			pokemonPrediction = predictedPokemon ?? pokemonPrediction;
+			//alert(predictedPokemon);
 			iteratePokemon();
 		} else {
 			throw new Error(`Unable to upload! ${response.status}: ${response.statusText}`);
@@ -43,9 +48,10 @@
 	});
 </script>
 
-<h2>Help train the model here:</h2>
+<!-- <h2>Help train the model here:</h2>
 
 <Button href="/training">Train</Button>
 
-<Button on:click={iteratePokemon}>Next pokemon</Button>
-<Draw {pokemonJSON} on:canvasSubmit={(e) => uploadCanvas(e.detail.blob)} />
+<Button on:click={iteratePokemon}>Next pokemon</Button> -->
+
+<Draw {pokemonJSON} {pokemonPrediction} on:canvasSubmit={(e) => uploadCanvas(e.detail.blob)} />

@@ -165,8 +165,6 @@ export async function POST({ request }: { request: Request }) {
 
 	const reqBlob = await request.blob();
 
-	console.log(reqBlob);
-
 	// try {
 	// 	const arrayBuffer = await reqBlob.arrayBuffer();
 

@@ -14,6 +14,7 @@
 	const dispatch = createEventDispatcher();
 
 	export let pokemonJSON: PokemonJSON | null;
+	export let pokemonPrediction = "";
 
 	let imgSize = 512;
 
@@ -88,6 +89,8 @@
 		e.preventDefault();
 
 		mouseDown = false;
+
+		predictPokemon();
 	};
 
 	const stopTouchDraw = (e: TouchEvent) => {
@@ -288,9 +291,8 @@
 		ctx.putImageData(prevCtx, 0, 0);
 	};
 
-	const submitCanvas = () => {
-		try {
-			const canvasBlobRet = canvasElement.toBlob((blob: Blob | null) => {
+	const predictPokemon = () => {
+		const canvasBlobRet = canvasElement.toBlob((blob: Blob | null) => {
 				if (blob) {
 					//saveAs(blob, "./test.png");
 					dispatch('canvasSubmit', {
@@ -300,6 +302,11 @@
 					throw new Error('Blob creation failed!');
 				}
 			});
+	}
+
+	const submitCanvas = () => {
+		try {
+			predictPokemon();
 
 			const pokemonCry = new Audio(pokemonJSON?.cries.latest);
 
@@ -329,12 +336,13 @@
 <svelte:window bind:innerWidth />
 
 <div class="w-full flex items-center flex-col">
-	<img src={pokemonJSON?.sprites.front_default} alt={pokemonJSON?.forms.name} />
-</div>
+	<!-- <img src={pokemonJSON?.sprites.front_default} alt={pokemonJSON?.forms.name} /> -->
+	{pokemonPrediction}
+</div> 
 
-<div class="flex w-full max-w-full flex-col items-center">
+<div class="flex w-full max-w-full flex-col items-center mt-5">
 	<div>
-		<div class="mb-3 flex">
+		<div class="mb-3 flex bg-sky-500 shadow-slate-200 rounded-md p-5">
 			<div class="flex flex-col w-1/3 space-y-1">
 				<h6>Choose Color</h6>
 				<ColorPicker bind:rgb={currColorRgb} bind:hex={currColor} />
@@ -344,7 +352,7 @@
 					<Range min="0" max="32" bind:value={drawWidth} />
 				</div>
 			</div>
-			<div class="grid grid-cols-2 w-1/3 space-x-1 space-y-2">
+			<div class="grid grid-cols-2 w-1/3 space-x-1 space-y-2 ml-12">
 				<Button class="bg-blue-500" on:click={() => (drawType = DrawTypes.draw)}>Draw</Button>
 				<Button class="bg-green-500" on:click={() => (drawType = DrawTypes.fill)}>Fill</Button>
 				<Button class="bg-purple-500" on:click={() => (drawType = DrawTypes.erase)}>Erase</Button>
@@ -370,6 +378,6 @@
 		/>
 	</div>
 	<div class="mt-3">
-		<Button on:click={() => submitCanvas()}>Submit</Button>
+		<Button on:click={() => submitCanvas()} class="bg-poke_red-500">Submit</Button>
 	</div>
 </div>
