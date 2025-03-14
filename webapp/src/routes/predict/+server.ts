@@ -197,7 +197,7 @@ export async function POST({ request }: { request: Request }) {
 	// }
 
 	try {
-		const response = await fetch('http://localhost:3000/predict', {
+		const response = await fetch('https://pred-model-echab4dfcybabuf9.westus-01.azurewebsites.net/predict', {
 			method: 'POST',
 			body: reqBlob
 		});
