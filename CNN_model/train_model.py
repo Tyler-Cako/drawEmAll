@@ -1,6 +1,6 @@
 import numpy as np
 # from sklearn.model_selection import train_test_split
-from augment import rotate, translate_x, translate_y, shear_x, shear_y, RandAugment
+from augment import rotate
 import math
 import tensorflow as tf
 import scipy.ndimage as ndimage
