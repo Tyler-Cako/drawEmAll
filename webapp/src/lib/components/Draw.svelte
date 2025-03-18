@@ -9,7 +9,6 @@
 	} from '$lib/types/PokemonJSON';
 	import ColorPicker, { type RgbaColor } from 'svelte-awesome-color-picker';
 	import { Range } from 'flowbite-svelte';
-	import { error } from '@sveltejs/kit';
 
 	const dispatch = createEventDispatcher();
 
@@ -97,6 +96,8 @@
 		e.preventDefault();
 
 		touchDown = false;
+
+		predictPokemon();
 	};
 
 	const draw = (e: MouseEvent) => {
@@ -146,14 +147,10 @@
 
 		const startX = e.offsetX;
 		const startY = e.offsetY;
-
+		
 		// Start Queue for BFS
 		const pixelsToCheck: Array<[number, number]> = [[startX, startY]];
-		const visited = new Set<[number, number]>();
-
-		// Init ticks for performance
-		let tickCount = 0;
-		const ticksPerUpdate = 50;
+		const visited = new Set<string>();
 
 		// imageData object for updating canvas
 		const imageData = ctx.getImageData(0, 0, imgSize, imgSize);
@@ -171,21 +168,22 @@
 
 		const range = 128 ** 2;
 
-		while (pixelsToCheck.length > 0 && tickCount < imgSize) {
+		while (pixelsToCheck.length > 0) {
 			const [x, y] = pixelsToCheck.pop() || [-1, -1];
 			const currentColor = getPixel(imageData, x, y);
 
 			// Check if point is within canvas bounds
 			if (x < 0 || y < 0 || x >= imgSize || y >= imgSize) continue;
-			// Check if we have hit a boundary
-			if (visited.has([x, y])) continue;
+			// Check if we have already filled
+			if (visited.has(`${x},${y}`)) continue;
 
+			// Check if we reached a boundary
 			if (!colorsMatch(currentColor, targetColor, range)) {
 				continue;
 			}
 
 			setPixel(imageData, fillColor, x, y);
-			visited.add([x, y]);
+			visited.add(`${x},${y}`);
 			// If I reach the border pixel, I don't add the surrounding pixels to the queue so it misses a few white pixels.diagonal ones?
 			pixelsToCheck.push([x + 1, y], [x - 1, y], [x, y - 1], [x, y + 1]);
 		}
@@ -195,16 +193,14 @@
 	};
 
 	const drawTouchFill = async (touch: Touch) => {
-		const startX = touch.clientX;
-		const startY = touch.clientY;
+		const rect = canvasElement.getBoundingClientRect();
+		const startX = Math.floor(touch.clientX - rect.left);
+		const startY = Math.floor(touch.clientY - rect.top);
+
 
 		// Start Queue for BFS
 		const pixelsToCheck: Array<[number, number]> = [[startX, startY]];
-		const visited = new Set<[number, number]>();
-
-		// Init ticks for performance
-		let tickCount = 0;
-		const ticksPerUpdate = 50;
+		const visited = new Set<string>();
 
 		// imageData object for updating canvas
 		const imageData = ctx.getImageData(0, 0, imgSize, imgSize);
@@ -222,21 +218,22 @@
 
 		const range = 128 ** 2;
 
-		while (pixelsToCheck.length > 0 && tickCount < imgSize) {
+		while (pixelsToCheck.length > 0) {
 			const [x, y] = pixelsToCheck.pop() || [-1, -1];
 			const currentColor = getPixel(imageData, x, y);
 
 			// Check if point is within canvas bounds
 			if (x < 0 || y < 0 || x >= imgSize || y >= imgSize) continue;
-			// Check if we have hit a boundary
-			if (visited.has([x, y])) continue;
+			// Check if we have already filled
+			if (visited.has(`${x},${y}`)) continue;
 
+			// Check if we reached a boundary
 			if (!colorsMatch(currentColor, targetColor, range)) {
 				continue;
 			}
 
 			setPixel(imageData, fillColor, x, y);
-			visited.add([x, y]);
+			visited.add(`${x},${y}`);
 			// If I reach the border pixel, I don't add the surrounding pixels to the queue so it misses a few white pixels.diagonal ones?
 			pixelsToCheck.push([x + 1, y], [x - 1, y], [x, y - 1], [x, y + 1]);
 		}
@@ -342,28 +339,28 @@
 
 <div class="flex w-full max-w-full flex-col items-center mt-5">
 	<div>
-		<div class="mb-3 flex bg-sky-500 shadow-slate-200 rounded-md p-5">
+		<div class="mb-3 flex bg-sky-500 shadow-slate-200 rounded-md p-5 w-full">
 			<div class="flex flex-col w-1/3 space-y-1">
 				<h6>Choose Color</h6>
 				<ColorPicker bind:rgb={currColorRgb} bind:hex={currColor} />
 				<h6>Paint size</h6>
 				<div class="flex">
-					<p class="w-1/6">{drawWidth}</p>
+					<p class="w-1/6">{drawWidth} </p>
 					<Range min="0" max="32" bind:value={drawWidth} />
 				</div>
 			</div>
 			<div class="grid grid-cols-2 w-1/3 space-x-1 space-y-2 ml-12">
-				<Button class="bg-blue-500" on:click={() => (drawType = DrawTypes.draw)}>Draw</Button>
-				<Button class="bg-green-500" on:click={() => (drawType = DrawTypes.fill)}>Fill</Button>
-				<Button class="bg-purple-500" on:click={() => (drawType = DrawTypes.erase)}>Erase</Button>
-				<Button class="bg-pink-500" on:click={() => clearCanvas()}>Clear</Button>
+				<Button class="bg-pink-500" on:touchDown={() => (drawType = DrawTypes.draw)} on:click={() => (drawType = DrawTypes.draw)}>Draw</Button>
+				<Button class="bg-green-500" on:touchDown={() => (drawType = DrawTypes.fill)} on:click={() => (drawType = DrawTypes.fill)}>Fill</Button>
+				<Button class="bg-purple-500" on:touchDown={() => (drawType = DrawTypes.erase)} on:click={() => (drawType = DrawTypes.erase)}>Erase</Button>
+				<Button class="bg-pink-500" on:touchDown={() => clearCanvas()} on:click={() => clearCanvas()}>Clear</Button>
 			</div>
 			<div class="flex h-1/2">
 				<Button on:click={() => undo()}>Undo</Button>
 			</div>
 		</div>
 		<canvas
-			class="items-center flex-initial shadow-lg shadow-slate-600 bg-poke_white-500 rounded-md"
+			class="items-center flex-initial shadow-lg shadow-slate-600 bg-poke_white-500 rounded-md w-full"
 			id="canvasElement"
 			width={imgSize}
 			height={imgSize}
@@ -378,6 +375,6 @@
 		/>
 	</div>
 	<div class="mt-3">
-		<Button on:click={() => submitCanvas()} class="bg-poke_red-500">Submit</Button>
+		<!-- <Button on:touchDown={() => submitCanvas()} on:click={() => submitCanvas()} class="bg-poke_red-500">Submit</Button> -->
 	</div>
 </div>
