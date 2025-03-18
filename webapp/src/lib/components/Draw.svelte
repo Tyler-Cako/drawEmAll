@@ -334,7 +334,7 @@
 
 <div class="w-full flex items-center flex-col">
 	<!-- <img src={pokemonJSON?.sprites.front_default} alt={pokemonJSON?.forms.name} /> -->
-	{pokemonPrediction}
+	{pokemonPrediction} &nbsp;
 </div> 
 
 <div class="flex w-full max-w-full flex-col items-center mt-5">
@@ -345,15 +345,15 @@
 				<ColorPicker bind:rgb={currColorRgb} bind:hex={currColor} />
 				<h6>Paint size</h6>
 				<div class="flex">
-					<p class="w-1/6">{drawWidth} </p>
+					<p class="w-1/6">{drawWidth}</p>
 					<Range min="0" max="32" bind:value={drawWidth} />
 				</div>
 			</div>
 			<div class="grid grid-cols-2 w-1/3 space-x-1 space-y-2 ml-12">
-				<Button class="bg-pink-500" on:touchDown={() => (drawType = DrawTypes.draw)} on:click={() => (drawType = DrawTypes.draw)}>Draw</Button>
-				<Button class="bg-green-500" on:touchDown={() => (drawType = DrawTypes.fill)} on:click={() => (drawType = DrawTypes.fill)}>Fill</Button>
-				<Button class="bg-purple-500" on:touchDown={() => (drawType = DrawTypes.erase)} on:click={() => (drawType = DrawTypes.erase)}>Erase</Button>
-				<Button class="bg-pink-500" on:touchDown={() => clearCanvas()} on:click={() => clearCanvas()}>Clear</Button>
+				<Button class="bg-pink-500" on:touchstart={() => (drawType = DrawTypes.draw)} on:click={() => (drawType = DrawTypes.draw)}>Draw</Button>
+				<Button class="bg-green-500" on:touchstart={() => (drawType = DrawTypes.fill)} on:click={() => (drawType = DrawTypes.fill)}>Fill</Button>
+				<Button class="bg-purple-500" on:touchstart={() => (drawType = DrawTypes.erase)} on:click={() => (drawType = DrawTypes.erase)}>Erase</Button>
+				<Button class="bg-pink-500" on:touchstart={() => clearCanvas()} on:click={() => clearCanvas()}>Clear</Button>
 			</div>
 			<div class="flex h-1/2">
 				<Button on:click={() => undo()}>Undo</Button>
@@ -375,6 +375,6 @@
 		/>
 	</div>
 	<div class="mt-3">
-		<!-- <Button on:touchDown={() => submitCanvas()} on:click={() => submitCanvas()} class="bg-poke_red-500">Submit</Button> -->
+		<!-- <Button on:touchstart={() => submitCanvas()} on:click={() => submitCanvas()} class="bg-poke_red-500">Submit</Button> -->
 	</div>
 </div>
