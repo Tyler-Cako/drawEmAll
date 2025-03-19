@@ -30,7 +30,7 @@
 	let drawType: DrawTypes = DrawTypes.draw;
 	let drawWidth: number = 3;
 
-	let currColor: string;
+	let currColor: string = '#000000';
 	let currColorRgb: RgbaColor = { r: 0, g: 0, b: 0, a: 1 };
 
 	let innerWidth: number = 0;
@@ -272,6 +272,8 @@
 	};
 
 	const clearCanvas = () => {
+		ctx.fillStyle = '#ffffff'
+		ctx.fillRect(0, 0, canvasElement.width, canvasElement.height)
 		ctx.reset();
 	};
 
