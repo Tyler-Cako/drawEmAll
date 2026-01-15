@@ -1,4 +1,4 @@
-import * as tf from '@tensorflow/tfjs';
+import { loadLayersModel, type LayersModel } from '@tensorflow/tfjs-node';
 import path from 'path';
 
 import { fileURLToPath } from 'url';
@@ -10,18 +10,13 @@ const __dirname = path.dirname(__filename);
 const modelPath = path.resolve(__dirname, './normalized_model_54299/model.json');
 const modelUrl = `file://${modelPath}`;
 
-let model: tf.LayersModel | null = null;
-
 export async function loadModel() {
     try {
-        const model = await tf.loadLayersModel(modelUrl); 
+        const model = await loadLayersModel(modelUrl); 
+        if (model == undefined) throw new Error("Failed to load model");
         console.log("Model loaded successfully");
-        return model;
+        return model as LayersModel;
     } catch (error) {
         console.error("Model failed to load: ", error);
     }
 };
-
-export function getModel(): tf.LayersModel | null {
-    return model;
-}

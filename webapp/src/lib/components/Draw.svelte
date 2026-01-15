@@ -2,9 +2,6 @@
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { Button } from 'flowbite-svelte';
 	import {
-		type PokemonJSON,
-		type PixelData,
-		type CanvasPt,
 		DrawTypes
 	} from '$lib/types/PokemonJSON';
 	import ColorPicker, { type RgbaColor } from 'svelte-awesome-color-picker';
@@ -12,7 +9,6 @@
 
 	const dispatch = createEventDispatcher();
 
-	export let pokemonJSON: PokemonJSON | null;
 	export let pokemonPrediction = "";
 
 	let imgSize = 512;
@@ -303,19 +299,19 @@
 			});
 	}
 
-	const submitCanvas = () => {
-		try {
-			predictPokemon();
+	// const submitCanvas = () => {
+	// 	try {
+	// 		predictPokemon();
 
-			const pokemonCry = new Audio(pokemonJSON?.cries.latest);
+	// 		const pokemonCry = new Audio(pokemonJSON?.cries.latest);
 
-			pokemonCry.volume = 0.3;
-			pokemonCry.play();
-			clearCanvas();
-		} catch (error) {
-			console.log(error);
-		}
-	};
+	// 		pokemonCry.volume = 0.3;
+	// 		pokemonCry.play();
+	// 		clearCanvas();
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 	}
+	// };
 
 	onMount(() => {
 		if (innerWidth < imgSize && innerWidth <= 512) {
@@ -377,6 +373,5 @@
 		/>
 	</div>
 	<div class="mt-3">
-		<!-- <Button on:touchstart={() => submitCanvas()} on:click={() => submitCanvas()} class="bg-poke_red-500">Submit</Button> -->
 	</div>
 </div>
